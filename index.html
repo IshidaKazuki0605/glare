@@ -48,7 +48,7 @@
 
         $("#disp").html([
           `コート代 ${courtTotalFee}円`,
-          `ゲスト   ${GUEST_UNIT_FEE}円×${guestTotalFee}人=${GUEST_UNIT_FEE * guestTotalFee}円`,
+          `ゲスト   ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
           `メンバー ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
           `余り     ${overageFee}円 (内部留保)`
         ].join("\n"));
