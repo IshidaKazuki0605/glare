@@ -1,24 +1,138 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>現在時間表示</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>グレア・テニスサークル</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        $(document).ready(function() {
-            function displayTime() {
-                const now = new Date();
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const seconds = now.getSeconds().toString().padStart(2, '0');
-                $('#time').text(`${hours}:${minutes}:${seconds}`);
-            }
-            setInterval(displayTime, 1000); // 1秒ごとに更新
+      $(document).ready(function () {
+        calcFee();
+
+        $("#court-number").change(function () {
+          calcFee();
         });
+
+        $("#court-sale").change(function () {
+          calcFee();
+        });
+
+        $("#guest-number").change(function () {
+          calcFee();
+        });
+
+        $("#member-number").change(function () {
+          calcFee();
+        });
+
+        function calcFee() {
+          const courtTotalFee = calcCourtTotalFee();
+          $("#court-total-fee").html(courtTotalFee);
+
+          const guestTotalFee = calcGuestTotalFee();
+          $("#guest-total-fee").html(guestTotalFee);
+
+          const shortageFee = calcShortageFee(courtTotalFee, guestTotalFee);
+          $("#shortage-fee").html(shortageFee);
+
+          const memberUnitFee = calcMemberUnitFee(
+            shortageFee,
+            $("#member-number").val()
+          );
+          $("#member-unit-fee").html(memberUnitFee);
+
+          const overageFee = calcOverageFee(
+            shortageFee,
+            memberUnitFee,
+            $("#member-number").val()
+          );
+          $("#overage-fee").html(overageFee);
+        }
+
+        function calcCourtTotalFee() {
+          return (
+            $("#court-number").val() *
+            ($("#court-sale").is(":checked") ? 4000 : 4400)
+          );
+        }
+
+        function calcGuestTotalFee() {
+          return $("#guest-number").val() * 1300;
+        }
+
+        function calcShortageFee(courtTotalFee, guestTotalFee) {
+          return courtTotalFee - guestTotalFee;
+        }
+
+        function calcMemberUnitFee(memberTotalFee, memberNumber) {
+          return Math.ceil(memberTotalFee / memberNumber / 100) * 100;
+        }
+
+        function calcOverageFee(shortageFee, memberUnitFee, memberNumber) {
+          return memberUnitFee * memberNumber - shortageFee;
+        }
+      });
     </script>
-</head>
-<body>
-    <h1>現在の時間: <span id="time"></span></h1>
-</body>
+  </head>
+
+  <body>
+    <div>
+      <label for="court-number">コートの数</label>
+      <input
+        type="number"
+        id="court-number"
+        name="court-number"
+        min="1"
+        max="3"
+        value="1"
+      />
+    </div>
+
+    <div>
+      <label for="court-sale">コート割引あり</label>
+      <input type="checkbox" id="court-sale" name="court-sale" />
+    </div>
+
+    <div>
+      <label for="guest-number">ゲストの人数</label>
+      <input
+        type="number"
+        id="guest-number"
+        name="guest-number"
+        min="0"
+        max="5"
+        value="2"
+      />
+    </div>
+
+    <div>
+      <label for="member-number">メンバーの人数</label>
+      <input
+        type="number"
+        id="member-number"
+        name="member-number"
+        min="1"
+        max="5"
+        value="3"
+      />
+    </div>
+
+    <hr />
+
+    <div>
+      <div>
+        <span>コートのレンタル料金: </span><span id="court-total-fee"></span>
+      </div>
+      <div>
+        <span>ゲスト全員から徴収する合計金額: </span
+        ><span id="guest-total-fee"></span>
+      </div>
+      <div><span>不足金: </span><span id="shortage-fee"></span></div>
+      <div>
+        <span>メンバー1人から徴収する金額: </span
+        ><span id="member-unit-fee"></span>
+      </div>
+      <div><span>余剰金: </span><span id="overage-fee"></span></div>
+    </div>
+  </body>
 </html>
