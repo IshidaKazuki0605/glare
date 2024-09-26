@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現在時間表示</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function displayTime() {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                $('#time').text(`${hours}:${minutes}:${seconds}`);
+            }
+            setInterval(displayTime, 1000); // 1秒ごとに更新
+        });
+    </script>
+</head>
+<body>
+    <h1>現在の時間: <span id="time"></span></h1>
+</body>
+</html>
