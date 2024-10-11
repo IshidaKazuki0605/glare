@@ -23,6 +23,10 @@
         calcFee();
       });
 
+      $("#use-overage-fee").change(function () {
+        calcFee();
+      });
+
       $("#guest-number").change(function () {
         calcFee();
       });
@@ -47,16 +51,28 @@
         const overageFee = calcOverageFee(shortageFee, memberUnitFee, $("#member-number").val());
         $("#overage-fee").html(overageFee);
 
-        $("#disp").html([
-          `コート代 ${courtTotalFee}円`,
-          `ゲスト   ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
-          `メンバー ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
-          `余り     ${overageFee}円 (内部留保)`
-        ].join("\n"));
+        if (($("#use-overage-fee").val()) == 0) {
+          $("#disp").html([
+            `コート代 ${courtTotalFee}円`,
+            `ゲスト　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
+            `メンバー ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
+            `余り　　 ${overageFee}円 (内部留保)`
+          ].join("\n"));
+        } else {
+          $("#disp").html([
+            `コート代 ${courtTotalFee}円 (内部保留の使用${($("#use-overage-fee").val())}円)`,
+            `ゲスト　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
+            `メンバー ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
+            `余り　　 ${overageFee}円 (内部留保)`
+          ].join("\n"));
+        }
       }
 
       function calcCourtTotalFee() {
-        return $("#court-number").val() * ($("#court-sale").is(":checked") ? COURT_SALE_UNIT_FEE : COURT_UNIT_FEE);
+        let courtUnitFee = ($("#court-sale").is(":checked") ? COURT_SALE_UNIT_FEE : COURT_UNIT_FEE);
+        let courtUnitFeeNoOverage = courtUnitFee * ($("#court-number").val());
+        let courtTotalFee = courtUnitFeeNoOverage - ($("#use-overage-fee").val());
+        return courtTotalFee;
       }
 
       function calcGuestTotalFee() {
@@ -107,18 +123,29 @@
     </div>
 
     <div>
-      <label for="guest-number">ゲストの人数</label>
-      <select id="guest-number">
-        <option value="0" selected>いない</option>
-        <option value="1">1人</option>
-        <option value="2">2人</option>
-        <option value="3">3人</option>
-        <option value="4">4人</option>
-        <option value="5">5人</option>
-        <option value="6">6人</option>
-        <option value="7">7人</option>
-        <option value="8">8人</option>
-        <option value="9">9人</option>
+      <label for="use-overage-fee">余剰金をコート代に充てる</label>
+      <select id="use-overage-fee">
+        <option value="0" selected>使わない</option>
+        <option value="100">100円</option>
+        <option value="200">200円</option>
+        <option value="300">300円</option>
+        <option value="400">400円</option>
+        <option value="500">500円</option>
+        <option value="600">600円</option>
+        <option value="700">700円</option>
+        <option value="800">800円</option>
+        <option value="900">900円</option>
+        <option value="1000">1000円</option>
+        <option value="1100">1100円</option>
+        <option value="1200">1200円</option>
+        <option value="1300">1300円</option>
+        <option value="1400">1400円</option>
+        <option value="1500">1500円</option>
+        <option value="1600">1600円</option>
+        <option value="1700">1700円</option>
+        <option value="1800">1800円</option>
+        <option value="1900">1900円</option>
+        <option value="2000">2000円</option>
       </select>
     </div>
 
@@ -136,6 +163,23 @@
         <option value="9">9人</option>
       </select>
     </div>
+
+    <div>
+      <label for="guest-number">ゲストの人数</label>
+      <select id="guest-number">
+        <option value="0" selected>いない</option>
+        <option value="1">1人</option>
+        <option value="2">2人</option>
+        <option value="3">3人</option>
+        <option value="4">4人</option>
+        <option value="5">5人</option>
+        <option value="6">6人</option>
+        <option value="7">7人</option>
+        <option value="8">8人</option>
+        <option value="9">9人</option>
+      </select>
+    </div>
+
   </section>
 
   <hr />
