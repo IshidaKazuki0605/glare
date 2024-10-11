@@ -56,14 +56,14 @@
 
         if (($("#use-overage-fee").val()) == 0) {
           $("#disp").html([
-            `コート代 ${courtTotalFee}円`,
+            `コート代 ${calcCourtUnitFeeNoOverage()}円`,
             `ゲスト　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
             `メンバー ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
             `余り　　 ${overageFee}円 (内部留保)`
           ].join("\n"));
         } else {
           $("#disp").html([
-            `コート代　　　 ${courtTotalFee}円`,
+            `コート代　　　 ${calcCourtUnitFeeNoOverage()}円`,
             `内部保留の使用 ${($("#use-overage-fee").val())}円`,
             `ゲスト　　　　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
             `メンバー　　　 ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
