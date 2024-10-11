@@ -36,12 +36,15 @@
       });
 
       function calcFee() {
-        const courtTotalFee = calcCourtTotalFee();
-        $("#court-total-fee").html(courtTotalFee);
+        const courtUnitFeeNoOverage = calcCourtUnitFeeNoOverage();
+        $("#court-total-fee").html(courtUnitFeeNoOverage);
 
         const guestTotalFee = calcGuestTotalFee();
         $("#guest-total-fee").html(guestTotalFee);
 
+        $("#disp-use-overage-fee").html($("#use-overage-fee").val());
+
+        const courtTotalFee = calcCourtTotalFee();
         const shortageFee = calcShortageFee(courtTotalFee, guestTotalFee);
         $("#shortage-fee").html(shortageFee);
 
@@ -60,19 +63,23 @@
           ].join("\n"));
         } else {
           $("#disp").html([
-            `コート代 ${courtTotalFee}円 (内部保留の使用${($("#use-overage-fee").val())}円)`,
-            `ゲスト　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
-            `メンバー ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
-            `余り　　 ${overageFee}円 (内部留保)`
+            `コート代　　　 ${courtTotalFee}円`,
+            `内部保留の使用 ${($("#use-overage-fee").val())}円`,
+            `ゲスト　　　　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
+            `メンバー　　　 ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
+            `余り　　　　　 ${overageFee}円 (内部留保)`
           ].join("\n"));
         }
       }
 
       function calcCourtTotalFee() {
+        return calcCourtUnitFeeNoOverage() - ($("#use-overage-fee").val());
+      }
+
+      function calcCourtUnitFeeNoOverage() {
         let courtUnitFee = ($("#court-sale").is(":checked") ? COURT_SALE_UNIT_FEE : COURT_UNIT_FEE);
         let courtUnitFeeNoOverage = courtUnitFee * ($("#court-number").val());
-        let courtTotalFee = courtUnitFeeNoOverage - ($("#use-overage-fee").val());
-        return courtTotalFee;
+        return courtUnitFeeNoOverage;
       }
 
       function calcGuestTotalFee() {
@@ -123,7 +130,7 @@
     </div>
 
     <div>
-      <label for="use-overage-fee">余剰金をコート代に充てる</label>
+      <label for="use-overage-fee">内部保留をコート代に充てる</label>
       <select id="use-overage-fee">
         <option value="0" selected>使わない</option>
         <option value="100">100円</option>
@@ -190,6 +197,9 @@
       <span>コートのレンタル料金: </span><span id="court-total-fee"></span>
     </div>
     <div>
+      <span>内部保留の使用: </span><span id="disp-use-overage-fee"></span>
+    </div>
+    <div>
       <span>ゲスト全員から徴収する合計金額: </span>
       <span id="guest-total-fee"></span>
     </div>
@@ -206,7 +216,7 @@
   <section>
     <h3>貼り付け用</h3>
     <button id="copy_clipboard">下記の文字列をコピー</button>
-    <div><textarea id="disp" rows="5" cols="40"></textarea></div>
+    <div><textarea id="disp" rows="6" cols="35"></textarea></div>
   </section>
 </body>
 
