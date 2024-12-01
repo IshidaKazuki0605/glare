@@ -15,13 +15,17 @@
     $(document).ready(function () {
       calcFee();
 
-      $("#court-number").change(function () {
+      // $("#court-number").change(function () {
+      //   calcFee();
+      // });
+
+      $("#court-type").change(function () {
         calcFee();
       });
 
-      $("#court-sale").change(function () {
-        calcFee();
-      });
+      // $("#court-sale").change(function () {
+      //   calcFee();
+      // });
 
       $("#use-overage-fee").change(function () {
         calcFee();
@@ -77,8 +81,10 @@
       }
 
       function calcCourtUnitFeeNoOverage() {
-        let courtUnitFee = ($("#court-sale").is(":checked") ? COURT_SALE_UNIT_FEE : COURT_UNIT_FEE);
-        let courtUnitFeeNoOverage = courtUnitFee * ($("#court-number").val());
+      //   let courtUnitFee = ($("#court-sale").is(":checked") ? COURT_SALE_UNIT_FEE : COURT_UNIT_FEE);
+      //   let courtUnitFeeNoOverage = courtUnitFee * ($("#court-number").val());
+        
+        let courtUnitFeeNoOverage = $("#court-type").val()
         return courtUnitFeeNoOverage;
       }
 
@@ -115,19 +121,36 @@
   <section>
     <h3>入力項目</h3>
 
-    <div>
+    <!-- <div>
       <label for="court-number">コートの数</label>
       <select id="court-number">
         <option value="1">1コート</option>
         <option value="2">2コート</option>
         <option value="3">3コート</option>
       </select>
-    </div>
+    </div> -->
 
     <div>
+      <label for="court-type">コートの種類</label>
+      <select id="court-type">
+        <option value="4400">【2-4テニス】1コート</option>
+        <option value="8800">【2-4テニス】2コート</option>
+        <option value="4000">【サンテニス】ハード1コート</option>
+        <option value="8000">【サンテニス】ハード2コート</option>
+        <option value="4600">【サンテニス】オムニ1コート</option>
+        <option value="9200">【サンテニス】オムニ2コート</option>
+        <option value="8600">【サンテニス】ハード1コート + オムニ1コート</option>
+        <option value="4400">【松テニ】1コート (割引なし ×)</option>
+        <option value="8800">【松テニ】2コート (割引なし ×)</option>
+        <option value="4000">【松テニ】1コート (割引あり ○)</option>
+        <option value="8000">【松テニ】2コート (割引あり ○)</option>
+      </select>
+    </div>
+
+    <!-- <div>
       <label for="court-sale">コート割引あり</label>
       <input type="checkbox" id="court-sale" name="court-sale" />
-    </div>
+    </div> -->
 
     <div>
       <label for="use-overage-fee">内部保留をコート代に充てる</label>
@@ -200,10 +223,10 @@
       <span>内部保留の使用: </span><span id="disp-use-overage-fee"></span>
     </div>
     <div>
-      <span>ゲスト全員から徴収する合計金額: </span>
+      <span>ゲスト全員から徴収する金額: </span>
       <span id="guest-total-fee"></span>
     </div>
-    <div><span>不足金: </span><span id="shortage-fee"></span></div>
+    <div><span>メンバーが負担する金額: </span><span id="shortage-fee"></span></div>
     <div>
       <span>メンバー1人あたりの負担額: </span>
       <span id="member-unit-fee"></span>
