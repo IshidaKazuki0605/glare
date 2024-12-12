@@ -59,17 +59,30 @@
           updateDisp();
         });
 
-        // 追加済み借りるコート一覧の「リセット」ボタンを押した時の挙動
-        $("#added-court-rent-reset-btn").on("click", function () {
-          if (window.confirm("追加済みの借りるコートをクリアします。")) {
-            addedCourtRentList = [];
-            $("#disp-added-court-rent-list").empty();
-            $("#disp-added-court-rent-list").append(
-              "借りるコートを追加してください。"
-            );
-            $("#disp-added-court-rent-fee-total").text(0);
+        // 追加済み借りるコート一覧の「クリア」ボタンを押した時の挙動
+        $("#added-court-rent-clear-btn").on("click", function () {
+          if (addedCourtRentList.length === 0) {
+            alert("追加済み借りるコートがありません。");
+          } else {
+            let confirmMsg = "下記の追加済みの借りるコートをクリアします。\n\n";
+            addedCourtRentList.forEach((addedCourtRent, i) => {
+              confirmMsg +=
+                `${i + 1}:` +
+                `${addedCourtRent.name}／` +
+                `${addedCourtRent.number}コート／` +
+                `${addedCourtRent.time}時間／` +
+                `${addedCourtRent.fee.toLocaleString()}円\n`;
+            });
+            if (window.confirm(confirmMsg)) {
+              addedCourtRentList = [];
+              $("#disp-added-court-rent-list").empty();
+              $("#disp-added-court-rent-list").append(
+                "借りるコートを追加してください。"
+              );
+              $("#disp-added-court-rent-fee-total").text(0);
 
-            updateDisp();
+              updateDisp();
+            }
           }
         });
 
@@ -218,14 +231,16 @@
           </div>
 
           <hr />
+
           <div>
-            合計コート代: <span id="disp-added-court-rent-fee-total">0</span>円
-            <button
-              type="button"
-              id="added-court-rent-reset-btn"
-              class="upd-disp"
+            <span
+              >合計コート代:
+              <span id="disp-added-court-rent-fee-total">0</span>円</span
             >
-              追加済みコートをクリア
+            <!-- デザインのためだけに挿入された悲しき空白 -->
+            <span>&nbsp;&nbsp;</span>
+            <button type="button" id="added-court-rent-clear-btn">
+              クリア
             </button>
           </div>
         </fieldset>
@@ -290,7 +305,7 @@
     <hr />
 
     <section>
-      <button id="copy_clipboard">下記の文字列をコピー</button>
+      <button id="copy_clipboard">計算結果をコピー</button>
       <div><textarea id="result" rows="7" cols="40"></textarea></div>
     </section>
   </body>
