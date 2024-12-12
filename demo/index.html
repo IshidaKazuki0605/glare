@@ -61,7 +61,7 @@
 
         // 追加済み借りるコート一覧の「リセット」ボタンを押した時の挙動
         $("#added-court-rent-reset-btn").on("click", function () {
-          if (window.confirm("追加済み借りるコート一覧をリセットします。")) {
+          if (window.confirm("追加済みの借りるコートをクリアします。")) {
             addedCourtRentList = [];
             $("#disp-added-court-rent-list").empty();
             $("#disp-added-court-rent-list").append(
@@ -205,6 +205,7 @@
               <option value="3">3時間</option>
             </select>
           </div>
+          <hr />
           <button type="button" id="input-court-rent-add-btn" class="upd-disp">
             借りるコートを追加
           </button>
@@ -219,14 +220,14 @@
           <hr />
           <div>
             合計コート代: <span id="disp-added-court-rent-fee-total">0</span>円
+            <button
+              type="button"
+              id="added-court-rent-reset-btn"
+              class="upd-disp"
+            >
+              追加済みコートをクリア
+            </button>
           </div>
-          <button
-            type="button"
-            id="added-court-rent-reset-btn"
-            class="upd-disp"
-          >
-            追加済みコートをリセットする
-          </button>
         </fieldset>
       </div>
       <div>
