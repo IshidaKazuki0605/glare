@@ -2,7 +2,11 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0 maximum-scale=1.0"
+    />
+
     <meta
       name="description"
       content="グレアテニスサークルの参加費を計算するツールです。"
@@ -79,10 +83,9 @@
                 "借りるコートを追加してください。"
               );
               $("#disp-added-court-rent-fee-total").text(0);
-              $("#result").val("借りるコートを追加してください。");
-
-              updateDisp();
+              $("#disp-result").val("借りるコートを追加してください。");
             }
+            updateDisp();
           }
         });
 
@@ -113,9 +116,9 @@
         function updateDisp() {
           // 参加費計算結果を描画する
           if (addedCourtRentList.length === 0) {
-            $("#result").html("借りるコートを追加してください。");
+            $("#disp-result").val("借りるコートを追加してください。");
           } else {
-            $("#result").html(
+            $("#disp-result").val(
               [
                 dispResultCourt(),
                 dispResultNaiho(),
@@ -178,31 +181,22 @@
           return calcMemberFeeTotal() - calcShortageFee();
         }
 
-        function writeClipboard(writeClipboardStr, alertStr) {
-          navigator.clipboard
-            .writeText(writeClipboardStr)
-            .then(function () {
-              alert(alertStr);
-            })
-            .catch(function (error) {
-              alert(
-                "コピーを失敗しました。バグ報告のためスクリーンショットを撮ってください。\n\n",
-                error
-              );
-            });
-        }
-
         // 参加費計算結果をコピー
         $("#copy-clipboard-result").click(function () {
           if (addedCourtRentList.length === 0) {
             alert("借りるコートを追加してください。");
           } else {
-            writeClipboard(
-              $("#result").val(),
+            const clipboard = $('<textarea readonly="readonly"></textarea>');
+            clipboard.val($("#disp-result").val());
+            $(this).append(clipboard);
+            clipboard.select();
+            document.execCommand("copy");
+            clipboard.remove();
+            alert(
               `下記をコピーしました。\n\n` +
-                `--------------------------------\n` +
-                `${$("#result").val()}\n` +
-                `--------------------------------`
+                `---------------------------\n` +
+                `${$("#disp-result").val()}\n` +
+                `---------------------------`
             );
           }
         });
@@ -324,9 +318,9 @@
 
     <section>
       <button id="copy-clipboard-result">計算結果をコピー</button>
-      <div><textarea id="result" rows="7" cols="40"></textarea></div>
+      <div><textarea id="disp-result" rows="7" cols="40"></textarea></div>
     </section>
 
-    <footer style="position: fixed; bottom: 0">Ver. 3.0.3</footer>
+    <footer style="position: fixed; bottom: 0">Ver. 3.1.0 デモ版</footer>
   </body>
 </html>
