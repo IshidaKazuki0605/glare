@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <meta name="version" content="3.0.1" />
+    <meta name="version" content="3.0.2" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
@@ -52,7 +52,7 @@
           });
 
           // 追加済み借りるコートの合計コート利用料の表示
-          $("#disp-added-court-rent-fee-total").text(
+          $("#disp-added-court-rent-fee-total").val(
             calcAddedCourtRentFeeTotal().toLocaleString()
           );
 
@@ -80,6 +80,7 @@
                 "借りるコートを追加してください。"
               );
               $("#disp-added-court-rent-fee-total").text(0);
+              $("#result").val("借りるコートを追加してください。");
 
               updateDisp();
             }
@@ -178,15 +179,33 @@
           return calcMemberFeeTotal() - calcShortageFee();
         }
 
+        function writeClipboard(writeClipboardStr, alertStr) {
+          navigator.clipboard
+            .writeText(writeClipboardStr)
+            .then(function () {
+              alert(alertStr);
+            })
+            .catch(function (error) {
+              alert(
+                "コピーを失敗しました。バグ報告のためスクリーンショットを撮ってください。\n\n",
+                error
+              );
+            });
+        }
+
         // 参加費計算結果をコピー
-        $("#copy_clipboard").click(function () {
-          const clipboard = $("<textarea></textarea>");
-          clipboard.val($("#disp").text());
-          $(this).append(clipboard);
-          clipboard.select();
-          document.execCommand("copy");
-          clipboard.remove();
-          alert("コピーしました。");
+        $("#copy-clipboard-result").click(function () {
+          if (addedCourtRentList.length === 0) {
+            alert("借りるコートを追加してください。");
+          } else {
+            writeClipboard(
+              $("#result").val(),
+              `下記をコピーしました。\n\n` +
+                `--------------------------------\n` +
+                `${$("#result").val()}\n` +
+                `--------------------------------`
+            );
+          }
         });
       });
     </script>
@@ -305,7 +324,7 @@
     <hr />
 
     <section>
-      <button id="copy_clipboard">計算結果をコピー</button>
+      <button id="copy-clipboard-result">計算結果をコピー</button>
       <div><textarea id="result" rows="7" cols="40"></textarea></div>
     </section>
   </body>
