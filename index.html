@@ -1,246 +1,326 @@
 <!DOCTYPE html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0 maximum-scale=1.0"
+    />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="グレアテニスサークルの参加費を計算するツールです。">
-  <title>グレアテニスサークル参加費計算ツール</title>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script>
-    const GUEST_UNIT_FEE = 1300;
-    const COURT_UNIT_FEE = 4400;
-    const COURT_SALE_UNIT_FEE = 4000;
+    <meta
+      name="description"
+      content="グレアテニスサークルの参加費を計算するツールです。"
+    />
+    <title>グレアテニスサークル参加費計算ツール</title>
+    <script src="../js/jquery-3.7.1.min.js"></script>
+    <style>
+      th {
+        text-align: left;
+      }
+    </style>
+    <script>
+      const GUEST_UNIT_FEE = 1300;
 
-    $(document).ready(function () {
-      calcFee();
+      let addedCourtRentList = [];
 
-      // $("#court-number").change(function () {
-      //   calcFee();
-      // });
+      $(document).ready(function () {
+        updateDisp();
 
-      $("#court-type").change(function () {
-        calcFee();
-      });
+        // 「借りるコートを追加」ボタンを押した時の挙動
+        $("#input-court-rent-add-btn").on("click", function () {
+          // 入力された借りるコート情報を、追加済み借りるコート情報一覧へ追加
+          addedCourtRentList.push({
+            name: $("#input-court-rent-fee-unit option:selected").text(),
+            number: Number($("#input-court-rent-number").val()),
+            time: Number($("#input-court-rent-time").val()),
+            fee: Number(
+              $("#input-court-rent-fee-unit").val() *
+                $("#input-court-rent-number").val() *
+                $("#input-court-rent-time").val()
+            ),
+          });
 
-      // $("#court-sale").change(function () {
-      //   calcFee();
-      // });
+          // 追加済み借りるコート情報一覧を描画
+          $("#disp-added-court-rent-list").empty();
+          addedCourtRentList.forEach((addedCourtRent, i) => {
+            $("#disp-added-court-rent-list").append(
+              "<div><small>" +
+                `${i + 1}:` +
+                `${addedCourtRent.name}／` +
+                `${addedCourtRent.number}コート／` +
+                `${addedCourtRent.time}時間／` +
+                `${addedCourtRent.fee.toLocaleString()}円` +
+                "</small></div>"
+            );
+          });
 
-      $("#use-overage-fee").change(function () {
-        calcFee();
-      });
+          // 追加済み借りるコートの合計コート利用料の表示
+          $("#disp-added-court-rent-fee-total").val(
+            calcAddedCourtRentFeeTotal().toLocaleString()
+          );
 
-      $("#guest-number").change(function () {
-        calcFee();
-      });
+          updateDisp();
+        });
 
-      $("#member-number").change(function () {
-        calcFee();
-      });
+        // 追加済み借りるコート一覧の「クリア」ボタンを押した時の挙動
+        $("#added-court-rent-clear-btn").on("click", function () {
+          if (addedCourtRentList.length === 0) {
+            alert("追加済み借りるコートがありません。");
+          } else {
+            let confirmMsg = "下記の追加済みの借りるコートをクリアします。\n\n";
+            addedCourtRentList.forEach((addedCourtRent, i) => {
+              confirmMsg +=
+                `${i + 1}:` +
+                `${addedCourtRent.name}／` +
+                `${addedCourtRent.number}コート／` +
+                `${addedCourtRent.time}時間／` +
+                `${addedCourtRent.fee.toLocaleString()}円\n`;
+            });
+            if (window.confirm(confirmMsg)) {
+              addedCourtRentList = [];
+              $("#disp-added-court-rent-list").empty();
+              $("#disp-added-court-rent-list").append(
+                "借りるコートを追加してください。"
+              );
+              $("#disp-added-court-rent-fee-total").text(0);
+              $("#disp-result").val("借りるコートを追加してください。");
+            }
+            updateDisp();
+          }
+        });
 
-      function calcFee() {
-        const courtUnitFeeNoOverage = calcCourtUnitFeeNoOverage();
-        $("#court-total-fee").html(courtUnitFeeNoOverage);
+        $(".upd-disp").change(function () {
+          updateDisp();
+        });
 
-        const guestTotalFee = calcGuestTotalFee();
-        $("#guest-total-fee").html(guestTotalFee);
-
-        $("#disp-use-overage-fee").html($("#use-overage-fee").val());
-
-        const courtTotalFee = calcCourtTotalFee();
-        const shortageFee = calcShortageFee(courtTotalFee, guestTotalFee);
-        $("#shortage-fee").html(shortageFee);
-
-        const memberUnitFee = calcMemberUnitFee(shortageFee, $("#member-number").val());
-        $("#member-unit-fee").html(memberUnitFee);
-
-        const overageFee = calcOverageFee(shortageFee, memberUnitFee, $("#member-number").val());
-        $("#overage-fee").html(overageFee);
-
-        if (($("#use-overage-fee").val()) == 0) {
-          $("#disp").html([
-            `コート代 ${calcCourtUnitFeeNoOverage()}円`,
-            `ゲスト　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
-            `メンバー ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
-            `余り　　 ${overageFee}円 (内部留保)`
-          ].join("\n"));
-        } else {
-          $("#disp").html([
-            `コート代　　　 ${calcCourtUnitFeeNoOverage()}円`,
-            `内部保留の使用 ${($("#use-overage-fee").val())}円`,
-            `ゲスト　　　　 ${GUEST_UNIT_FEE}円×${$("#guest-number").val()}人=${GUEST_UNIT_FEE * $("#guest-number").val()}円`,
-            `メンバー　　　 ${memberUnitFee}円×${$("#member-number").val()}人=${memberUnitFee * $("#member-number").val()}円`,
-            `余り　　　　　 ${overageFee}円 (内部留保)`
-          ].join("\n"));
+        function dispResultCourt() {
+          return `コート　：${calcAddedCourtRentFeeTotal().toLocaleString()}円`;
         }
-      }
 
-      function calcCourtTotalFee() {
-        return calcCourtUnitFeeNoOverage() - ($("#use-overage-fee").val());
-      }
+        function dispResultNaiho() {
+          return `内部保留：${getInputNaiho().toLocaleString()}円`;
+        }
 
-      function calcCourtUnitFeeNoOverage() {
-      //   let courtUnitFee = ($("#court-sale").is(":checked") ? COURT_SALE_UNIT_FEE : COURT_UNIT_FEE);
-      //   let courtUnitFeeNoOverage = courtUnitFee * ($("#court-number").val());
+        function dispResultGuestFee() {
+          return `ゲスト　：${GUEST_UNIT_FEE.toLocaleString()}円×${getInputGuestNumber()}人＝${calcGuestFeeTotal().toLocaleString()}円`;
+        }
 
-        let courtUnitFeeNoOverage = $("#court-type").val()
-        return courtUnitFeeNoOverage;
-      }
+        function dispResultMemberFee() {
+          return `メンバー：${calcMemberFeeUnit().toLocaleString()}円×${getInputMemberNumber()}人＝${calcMemberFeeTotal().toLocaleString()}円`;
+        }
 
-      function calcGuestTotalFee() {
-        return $("#guest-number").val() * GUEST_UNIT_FEE;
-      }
+        function dispResultOverage() {
+          return `余り　　：${calcOverage().toLocaleString()}円`;
+        }
 
-      function calcShortageFee(courtTotalFee, guestTotalFee) {
-        return courtTotalFee - guestTotalFee;
-      }
+        function updateDisp() {
+          // 参加費計算結果を描画する
+          if (addedCourtRentList.length === 0) {
+            $("#disp-result").val("借りるコートを追加してください。");
+          } else {
+            $("#disp-result").val(
+              [
+                dispResultCourt(),
+                dispResultNaiho(),
+                dispResultGuestFee(),
+                dispResultMemberFee(),
+                dispResultOverage(),
+              ].join("\n")
+            );
+          }
+        }
 
-      function calcMemberUnitFee(memberTotalFee, memberNumber) {
-        return Math.ceil(memberTotalFee / memberNumber / 100) * 100;
-      }
+        // 追加済み借りるコートの合計利用料
+        function calcAddedCourtRentFeeTotal() {
+          return addedCourtRentList.reduce(
+            (sum, addedCourtRent) => sum + (addedCourtRent.fee || 0),
+            0
+          );
+        }
 
-      function calcOverageFee(shortageFee, memberUnitFee, memberNumber) {
-        return memberUnitFee * memberNumber - shortageFee;
-      }
+        // 入力した内部保留の金額
+        function getInputNaiho() {
+          return Number($("#input-naiho").val());
+        }
 
-      $("#copy_clipboard").click(function () {
-        const clipboard = $("<textarea></textarea>");
-        clipboard.val($("#disp").text());
-        $(this).append(clipboard);
-        clipboard.select();
-        document.execCommand("copy");
-        clipboard.remove();
-        alert("コピーしました。")
+        // 入力したメンバーの参加人数を取得
+        function getInputMemberNumber() {
+          return Number($("#input-member-number").val());
+        }
+
+        // 入力したゲストの参加人数を取得
+        function getInputGuestNumber() {
+          return Number($("#input-guest-number").val());
+        }
+
+        // ゲストの合計参加費
+        function calcGuestFeeTotal() {
+          return getInputGuestNumber() * GUEST_UNIT_FEE;
+        }
+
+        // 不足金の計算
+        // (不足金) = (コート利用料) - (ゲストの合計参加費) - (内部保留分)
+        function calcShortageFee() {
+          return (
+            calcAddedCourtRentFeeTotal() - calcGuestFeeTotal() - getInputNaiho()
+          );
+        }
+
+        // メンバ一人当たりの参加費を計算
+        function calcMemberFeeUnit() {
+          return Math.ceil(calcShortageFee() / getInputMemberNumber() / 1) * 1;
+        }
+
+        // 結果的にメンバ全員が負担することになる参加費を計算
+        function calcMemberFeeTotal() {
+          return calcMemberFeeUnit() * getInputMemberNumber();
+        }
+
+        // 最終的に余る金額を計算
+        function calcOverage() {
+          return calcMemberFeeTotal() - calcShortageFee();
+        }
+
+        // 参加費計算結果をコピー
+        $("#copy-clipboard-result").click(function () {
+          if (addedCourtRentList.length === 0) {
+            alert("借りるコートを追加してください。");
+          } else {
+            const clipboard = $('<textarea readonly="readonly"></textarea>');
+            clipboard.val($("#disp-result").val());
+            $(this).append(clipboard);
+            clipboard.select();
+            document.execCommand("copy");
+            clipboard.remove();
+            alert(
+              `下記をコピーしました。\n\n` +
+                `---------------------------\n` +
+                `${$("#disp-result").val()}\n` +
+                `---------------------------`
+            );
+          }
+        });
       });
-    });
-  </script>
-</head>
+    </script>
+  </head>
 
-<body>
-  <section>
-    <h3>入力項目</h3>
+  <body>
+    <section>
+      <div>
+        <fieldset>
+          <legend>借りるコートを追加</legend>
 
-    <!-- <div>
-      <label for="court-number">コートの数</label>
-      <select id="court-number">
-        <option value="1">1コート</option>
-        <option value="2">2コート</option>
-        <option value="3">3コート</option>
-      </select>
-    </div> -->
+          <div>
+            <select id="input-court-rent-fee-unit">
+              <option value="2200">【2-4テニス】オムニ</option>
+              <option value="2200">【2-4テニス】ハード</option>
+              <option value="2300">【サンテニス】オムニ</option>
+              <option value="2000">【サンテニス】ハード</option>
+              <option value="2200">【松戸テニ】割引 ×</option>
+              <option value="2000">【松戸テニ】割引 ○</option>
+            </select>
+            <select id="input-court-rent-number">
+              <option value="1" selected>1コート</option>
+              <option value="2">2コート</option>
+              <option value="3">3コート</option>
+            </select>
+            <select id="input-court-rent-time">
+              <option value="1">1時間</option>
+              <option value="2" selected>2時間</option>
+              <option value="3">3時間</option>
+            </select>
+          </div>
+          <hr />
+          <button type="button" id="input-court-rent-add-btn" class="upd-disp">
+            借りるコートを追加
+          </button>
+        </fieldset>
 
-    <div>
-      <label for="court-type">コートの種類</label>
-      <select id="court-type">
-        <option value="4400">【2-4テニス】1コート</option>
-        <option value="8800">【2-4テニス】2コート</option>
-        <option value="4000">【サンテニス】ハード1コート</option>
-        <option value="8000">【サンテニス】ハード2コート</option>
-        <option value="4600">【サンテニス】オムニ1コート</option>
-        <option value="9200">【サンテニス】オムニ2コート</option>
-        <option value="8600">【サンテニス】ハード1コート + オムニ1コート</option>
-        <option value="4400">【松テニ】1コート (割引なし ×)</option>
-        <option value="8800">【松テニ】2コート (割引なし ×)</option>
-        <option value="4000">【松テニ】1コート (割引あり ○)</option>
-        <option value="8000">【松テニ】2コート (割引あり ○)</option>
-      </select>
-    </div>
+        <fieldset>
+          <legend>追加済み借りるコート一覧</legend>
+          <div id="disp-added-court-rent-list" class="upd-disp">
+            借りるコートを追加してください。
+          </div>
 
-    <!-- <div>
-      <label for="court-sale">コート割引あり</label>
-      <input type="checkbox" id="court-sale" name="court-sale" />
-    </div> -->
+          <hr />
 
-    <div>
-      <label for="use-overage-fee">内部保留をコート代に充てる</label>
-      <select id="use-overage-fee">
-        <option value="0" selected>使わない</option>
-        <option value="100">100円</option>
-        <option value="200">200円</option>
-        <option value="300">300円</option>
-        <option value="400">400円</option>
-        <option value="500">500円</option>
-        <option value="600">600円</option>
-        <option value="700">700円</option>
-        <option value="800">800円</option>
-        <option value="900">900円</option>
-        <option value="1000">1000円</option>
-        <option value="1100">1100円</option>
-        <option value="1200">1200円</option>
-        <option value="1300">1300円</option>
-        <option value="1400">1400円</option>
-        <option value="1500">1500円</option>
-        <option value="1600">1600円</option>
-        <option value="1700">1700円</option>
-        <option value="1800">1800円</option>
-        <option value="1900">1900円</option>
-        <option value="2000">2000円</option>
-      </select>
-    </div>
+          <div>
+            <span
+              >合計コート代:
+              <span id="disp-added-court-rent-fee-total">0</span>円</span
+            >
+            <!-- デザインのためだけに挿入された悲しき空白 -->
+            <span>&nbsp;&nbsp;</span>
+            <button type="button" id="added-court-rent-clear-btn">
+              クリア
+            </button>
+          </div>
+        </fieldset>
+      </div>
+      <div>
+        <label for="input-naiho">内部保留の使用</label>
+        <select id="input-naiho" class="upd-disp">
+          <option value="0" selected>使わない</option>
+          <option value="100">100円</option>
+          <option value="200">200円</option>
+          <option value="300">300円</option>
+          <option value="400">400円</option>
+          <option value="500">500円</option>
+          <option value="600">600円</option>
+          <option value="700">700円</option>
+          <option value="800">800円</option>
+          <option value="900">900円</option>
+          <option value="1000">1000円</option>
+          <option value="1100">1100円</option>
+          <option value="1200">1200円</option>
+          <option value="1300">1300円</option>
+          <option value="1400">1400円</option>
+          <option value="1500">1500円</option>
+          <option value="1600">1600円</option>
+          <option value="1700">1700円</option>
+          <option value="1800">1800円</option>
+          <option value="1900">1900円</option>
+          <option value="2000">2000円</option>
+        </select>
+      </div>
+      <div>
+        <label for="input-member-number">メンバーの人数</label>
+        <select id="input-member-number" class="upd-disp">
+          <option value="1">1人</option>
+          <option value="2">2人</option>
+          <option value="3">3人</option>
+          <option value="4" selected>4人</option>
+          <option value="5">5人</option>
+          <option value="6">6人</option>
+          <option value="7">7人</option>
+          <option value="8">8人</option>
+          <option value="9">9人</option>
+        </select>
+      </div>
+      <div>
+        <label for="input-guest-number">ゲストの人数</label>
+        <select id="input-guest-number" class="upd-disp">
+          <option value="0" selected>いない</option>
+          <option value="1">1人</option>
+          <option value="2">2人</option>
+          <option value="3">3人</option>
+          <option value="4">4人</option>
+          <option value="5">5人</option>
+          <option value="6">6人</option>
+          <option value="7">7人</option>
+          <option value="8">8人</option>
+          <option value="9">9人</option>
+        </select>
+      </div>
+    </section>
 
-    <div>
-      <label for="member-number">メンバーの人数</label>
-      <select id="member-number">
-        <option value="1">1人</option>
-        <option value="2">2人</option>
-        <option value="3">3人</option>
-        <option value="4" selected>4人</option>
-        <option value="5">5人</option>
-        <option value="6">6人</option>
-        <option value="7">7人</option>
-        <option value="8">8人</option>
-        <option value="9">9人</option>
-      </select>
-    </div>
+    <hr />
 
-    <div>
-      <label for="guest-number">ゲストの人数</label>
-      <select id="guest-number">
-        <option value="0" selected>いない</option>
-        <option value="1">1人</option>
-        <option value="2">2人</option>
-        <option value="3">3人</option>
-        <option value="4">4人</option>
-        <option value="5">5人</option>
-        <option value="6">6人</option>
-        <option value="7">7人</option>
-        <option value="8">8人</option>
-        <option value="9">9人</option>
-      </select>
-    </div>
+    <section>
+      <button id="copy-clipboard-result">計算結果をコピー</button>
+      <div><textarea id="disp-result" rows="7" cols="40"></textarea></div>
+    </section>
 
-  </section>
-
-  <hr />
-
-  <section>
-    <h3>集計結果</h3>
-    <div>
-      <span>コートのレンタル料金: </span><span id="court-total-fee"></span>
-    </div>
-    <div>
-      <span>内部保留の使用: </span><span id="disp-use-overage-fee"></span>
-    </div>
-    <div>
-      <span>ゲスト全員から徴収する金額: </span>
-      <span id="guest-total-fee"></span>
-    </div>
-    <div><span>メンバーが負担する金額: </span><span id="shortage-fee"></span></div>
-    <div>
-      <span>メンバー1人あたりの負担額: </span>
-      <span id="member-unit-fee"></span>
-    </div>
-    <div><span>余剰金: </span><span id="overage-fee"></span></div>
-  </section>
-
-  <hr />
-
-  <section>
-    <h3>貼り付け用</h3>
-    <button id="copy_clipboard">下記の文字列をコピー</button>
-    <div><textarea id="disp" rows="6" cols="35"></textarea></div>
-  </section>
-</body>
-
+    <footer style="position: fixed; bottom: 0">Ver. 3.1.0</footer>
+  </body>
 </html>
