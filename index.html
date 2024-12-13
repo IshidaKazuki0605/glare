@@ -45,7 +45,7 @@
           addedCourtRentList.forEach((addedCourtRent, i) => {
             $("#disp-added-court-rent-list").append(
               "<div><small>" +
-                `${i + 1}:` +
+                `${i + 1}` +
                 `${addedCourtRent.name}／` +
                 `${addedCourtRent.number}コート／` +
                 `${addedCourtRent.time}時間／` +
@@ -70,7 +70,7 @@
             let confirmMsg = "下記の追加済みの借りるコートをクリアします。\n\n";
             addedCourtRentList.forEach((addedCourtRent, i) => {
               confirmMsg +=
-                `${i + 1}:` +
+                `${i + 1}` +
                 `${addedCourtRent.name}／` +
                 `${addedCourtRent.number}コート／` +
                 `${addedCourtRent.time}時間／` +
@@ -212,12 +212,24 @@
 
           <div>
             <select id="input-court-rent-fee-unit">
-              <option value="2200">【2-4テニス】オムニ</option>
-              <option value="2200">【2-4テニス】ハード</option>
-              <option value="2300">【サンテニス】オムニ</option>
-              <option value="2000">【サンテニス】ハード</option>
-              <option value="2200">【松戸テニ】割引 ×</option>
-              <option value="2000">【松戸テニ】割引 ○</option>
+              <option value="2200" label="【🕗2-4テニス】🏖️オムニ">
+                【2-4テニス】️オムニ
+              </option>
+              <option value="2200" label="【🕗2-4テニス】🍘ハード">
+                【2-4テニス】ハード
+              </option>
+              <option value="2300" label="【🌞サンテニス】🏖️オムニ">
+                【サンテニス】オムニ
+              </option>
+              <option value="2000" label="【🌞サンテニス】🍘ハード">
+                【サンテニス】ハード
+              </option>
+              <option value="2200" label="【🅿️松テニ】割引なし🙅">
+                【松テニ】割引なし
+              </option>
+              <option value="2000" label="【🅿️松テニ】割引あり🙆">
+                【松テニ】割引あり
+              </option>
             </select>
             <select id="input-court-rent-number">
               <option value="1" selected>1コート</option>
@@ -321,6 +333,6 @@
       <div><textarea id="disp-result" rows="7" cols="40"></textarea></div>
     </section>
 
-    <footer style="position: fixed; bottom: 0">Ver. 3.1.0</footer>
+    <footer style="position: fixed; bottom: 0">Ver. 3.1.1</footer>
   </body>
 </html>
