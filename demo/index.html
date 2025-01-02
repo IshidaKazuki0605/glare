@@ -34,13 +34,13 @@
         $("#input-court-rent-add-btn").on("click", function () {
           // 入力された借りるコート情報を、追加済み借りるコート情報一覧へ追加
           addedCourtRentList.push({
-            name: $("#input-court-rent-fee-unit option:selected").text(),
+            name: $("#input-court-rent-fee-unit option:selected").text().trim(),
             number: Number($("#input-court-rent-number").val()),
             time: Number($("#input-court-rent-time").val()),
             fee: Number(
-              $("#input-court-rent-fee-unit").val() *
-                $("#input-court-rent-number").val() *
-                $("#input-court-rent-time").val()
+              Number($("#input-court-rent-fee-unit").val()) *
+                Number($("#input-court-rent-number").val()) *
+                Number($("#input-court-rent-time").val())
             ),
           });
 
@@ -72,9 +72,8 @@
             alert("追加済み借りるコートがありません。");
           } else {
             let confirmMsg = "下記の追加済みの借りるコートをクリアします。\n\n";
-            addedCourtRentList.forEach((addedCourtRent, i) => {
+            addedCourtRentList.forEach((addedCourtRent) => {
               confirmMsg +=
-                `${i + 1}` +
                 `${addedCourtRent.name}／` +
                 `${addedCourtRent.number}コート／` +
                 `${addedCourtRent.time}時間／` +
@@ -98,7 +97,11 @@
         });
 
         function dispResultCourt() {
-          return `コート　：${calcAddedCourtRentFeeTotal().toLocaleString()}円`;
+          let resultCourt = "";
+          addedCourtRentList.forEach((court) => {
+            resultCourt += `${court.name} :${court.fee.toLocaleString()}円\n`;
+          });
+          return resultCourt;
         }
 
         function dispResultGuestFee() {
@@ -155,9 +158,7 @@
         // 不足金の計算
         // (不足金) = (コート利用料) - (ゲストの合計参加費)
         function calcShortageFee() {
-          return (
-            calcAddedCourtRentFeeTotal() - calcGuestFeeTotal()
-          );
+          return calcAddedCourtRentFeeTotal() - calcGuestFeeTotal();
         }
 
         // メンバ一人当たりの参加費を計算
@@ -302,7 +303,7 @@
     </section>
 
     <footer style="position: fixed; bottom: 0">
-      <span>Ver. 3.2.0</span>
+      <span>Ver. 3.3.0</span>
       <span>デモ版</span>
     </footer>
   </body>
