@@ -34,13 +34,13 @@
         $("#input-court-rent-add-btn").on("click", function () {
           // 入力された借りるコート情報を、追加済み借りるコート情報一覧へ追加
           addedCourtRentList.push({
-            name: $("#input-court-rent-fee-unit option:selected").text(),
+            name: $("#input-court-rent-fee-unit option:selected").text().trim(),
             number: Number($("#input-court-rent-number").val()),
             time: Number($("#input-court-rent-time").val()),
             fee: Number(
-              $("#input-court-rent-fee-unit").val() *
-                $("#input-court-rent-number").val() *
-                $("#input-court-rent-time").val()
+              Number($("#input-court-rent-fee-unit").val()) *
+                Number($("#input-court-rent-number").val()) *
+                Number($("#input-court-rent-time").val())
             ),
           });
 
@@ -72,9 +72,8 @@
             alert("追加済み借りるコートがありません。");
           } else {
             let confirmMsg = "下記の追加済みの借りるコートをクリアします。\n\n";
-            addedCourtRentList.forEach((addedCourtRent, i) => {
+            addedCourtRentList.forEach((addedCourtRent) => {
               confirmMsg +=
-                `${i + 1}` +
                 `${addedCourtRent.name}／` +
                 `${addedCourtRent.number}コート／` +
                 `${addedCourtRent.time}時間／` +
@@ -98,11 +97,11 @@
         });
 
         function dispResultCourt() {
-          return `コート　：${calcAddedCourtRentFeeTotal().toLocaleString()}円`;
-        }
-
-        function dispResultNaiho() {
-          return `内部保留：${getInputNaiho().toLocaleString()}円`;
+          let resultCourt = "";
+          addedCourtRentList.forEach((court) => {
+            resultCourt += `${court.name} :${court.fee.toLocaleString()}円\n`;
+          });
+          return resultCourt;
         }
 
         function dispResultGuestFee() {
@@ -125,7 +124,6 @@
             $("#disp-result").val(
               [
                 dispResultCourt(),
-                dispResultNaiho(),
                 dispResultGuestFee(),
                 dispResultMemberFee(),
                 dispResultOverage(),
@@ -140,11 +138,6 @@
             (sum, addedCourtRent) => sum + (addedCourtRent.fee || 0),
             0
           );
-        }
-
-        // 入力した内部保留の金額
-        function getInputNaiho() {
-          return Number($("#input-naiho").val());
         }
 
         // 入力したメンバーの参加人数を取得
@@ -163,11 +156,9 @@
         }
 
         // 不足金の計算
-        // (不足金) = (コート利用料) - (ゲストの合計参加費) - (内部保留分)
+        // (不足金) = (コート利用料) - (ゲストの合計参加費)
         function calcShortageFee() {
-          return (
-            calcAddedCourtRentFeeTotal() - calcGuestFeeTotal() - getInputNaiho()
-          );
+          return calcAddedCourtRentFeeTotal() - calcGuestFeeTotal();
         }
 
         // メンバ一人当たりの参加費を計算
@@ -274,32 +265,6 @@
         </fieldset>
       </div>
       <div>
-        <label for="input-naiho">内部保留の使用</label>
-        <select id="input-naiho" class="upd-disp">
-          <option value="0" selected>使わない</option>
-          <option value="100">100円</option>
-          <option value="200">200円</option>
-          <option value="300">300円</option>
-          <option value="400">400円</option>
-          <option value="500">500円</option>
-          <option value="600">600円</option>
-          <option value="700">700円</option>
-          <option value="800">800円</option>
-          <option value="900">900円</option>
-          <option value="1000">1000円</option>
-          <option value="1100">1100円</option>
-          <option value="1200">1200円</option>
-          <option value="1300">1300円</option>
-          <option value="1400">1400円</option>
-          <option value="1500">1500円</option>
-          <option value="1600">1600円</option>
-          <option value="1700">1700円</option>
-          <option value="1800">1800円</option>
-          <option value="1900">1900円</option>
-          <option value="2000">2000円</option>
-        </select>
-      </div>
-      <div>
         <label for="input-member-number">メンバーの人数</label>
         <select id="input-member-number" class="upd-disp">
           <option value="1">1人</option>
@@ -338,7 +303,7 @@
     </section>
 
     <footer style="position: fixed; bottom: 0">
-      <span>Ver. 3.1.2</span>
+      <span>Ver. 3.3.0</span>
     </footer>
   </body>
 </html>
