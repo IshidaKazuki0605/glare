@@ -12,7 +12,11 @@
       content="グレアテニスサークルの参加費を計算するツールです。"
     />
     <title>グレアテニスサークル参加費計算ツール</title>
-    <script src="./js/jquery-3.7.1.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+      integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8="
+      crossorigin="anonymous"
+    ></script>
     <style>
       th {
         text-align: left;
@@ -55,7 +59,7 @@
           });
 
           // 追加済み借りるコートの合計コート利用料の表示
-          $("#disp-added-court-rent-fee-total").val(
+          $("#disp-added-court-rent-fee-total").text(
             calcAddedCourtRentFeeTotal().toLocaleString()
           );
 
@@ -333,6 +337,8 @@
       <div><textarea id="disp-result" rows="7" cols="40"></textarea></div>
     </section>
 
-    <footer style="position: fixed; bottom: 0">Ver. 3.1.1</footer>
+    <footer style="position: fixed; bottom: 0">
+      <span>Ver. 3.1.2</span>
+    </footer>
   </body>
 </html>
