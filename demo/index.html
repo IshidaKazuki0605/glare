@@ -12,18 +12,15 @@
       content="グレアテニスサークルの参加費を計算するツールです。"
     />
     <title>グレアテニスサークル参加費計算ツール</title>
-    <script
-      src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
-      integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8="
-      crossorigin="anonymous"
-    ></script>
+    <script src="./../js/jquery-3.7.1.min.js"></script>
     <style>
       th {
         text-align: left;
       }
     </style>
     <script>
-      const GUEST_UNIT_FEE = 1300;
+      const GUEST_UNIT_FEE = 1500;
+      const COURT_RENT_SHITEI_FEE = 500;
 
       let addedCourtRentList = [];
 
@@ -33,14 +30,28 @@
         // 「借りるコートを追加」ボタンを押した時の挙動
         $("#input-court-rent-add-btn").on("click", function () {
           // 入力された借りるコート情報を、追加済み借りるコート情報一覧へ追加
+          let fee = Number(
+            Number($("#input-court-rent-fee-unit").val()) *
+              Number($("#input-court-rent-number").val()) *
+              Number($("#input-court-rent-time").val())
+          );
+          if (
+            Number(
+              $('input:radio[name="input-court-rent-shitei"]:checked').val()
+            )
+          ) {
+            fee +=
+              COURT_RENT_SHITEI_FEE *
+              Number($("#input-court-rent-number").val());
+          }
+          $('input:radio[name="input-court-rent-shitei"]:checked').val();
           addedCourtRentList.push({
             name: $("#input-court-rent-fee-unit option:selected").text().trim(),
             number: Number($("#input-court-rent-number").val()),
             time: Number($("#input-court-rent-time").val()),
-            fee: Number(
-              Number($("#input-court-rent-fee-unit").val()) *
-                Number($("#input-court-rent-number").val()) *
-                Number($("#input-court-rent-time").val())
+            fee: fee,
+            shitei: Number(
+              $('input:radio[name="input-court-rent-shitei"]:checked').val()
             ),
           });
 
@@ -49,11 +60,12 @@
           addedCourtRentList.forEach((addedCourtRent, i) => {
             $("#disp-added-court-rent-list").append(
               "<div><small>" +
-                `${i + 1}` +
-                `${addedCourtRent.name}／` +
-                `${addedCourtRent.number}コート／` +
-                `${addedCourtRent.time}時間／` +
-                `${addedCourtRent.fee.toLocaleString()}円` +
+                `${i + 1}: ` +
+                `${addedCourtRent.name}/` +
+                `${addedCourtRent.number}ｺｰﾄ/` +
+                `${addedCourtRent.time}h/` +
+                `${addedCourtRent.fee}円／` +
+                `ｺｰﾄ指定${addedCourtRent.shitei ? "⭕️" : "❌"}` +
                 "</small></div>"
             );
           });
@@ -207,23 +219,23 @@
 
           <div>
             <select id="input-court-rent-fee-unit">
-              <option value="2200" label="【🕗2-4テニス】🏖️オムニ">
-                【2-4テニス】️オムニ
+              <option value="2500" label="[松テニ]割引なし❌">
+                [松テニ]割引なし❌
               </option>
-              <option value="2200" label="【🕗2-4テニス】🍘ハード">
-                【2-4テニス】ハード
+              <option value="2250" label="[松テニ]割引あり⭕️">
+                [松テニ]割引あり⭕️
               </option>
-              <option value="2300" label="【🌞サンテニス】🏖️オムニ">
-                【サンテニス】オムニ
+              <option value="2000" label="[サンテニス]ハード">
+                [サンテニス]ハード
               </option>
-              <option value="2000" label="【🌞サンテニス】🍘ハード">
-                【サンテニス】ハード
+              <option value="2300" label="[サンテニス]オムニ">
+                [サンテニス]オムニ
               </option>
-              <option value="2200" label="【🅿️松テニ】割引なし🙅">
-                【松テニ】割引なし
+              <option value="2200" label="[2-4テニス]ハード">
+                [2-4テニス]ハード
               </option>
-              <option value="2000" label="【🅿️松テニ】割引あり🙆">
-                【松テニ】割引あり
+              <option value="2200" label="[2-4テニス]オムニ">
+                [2-4テニス]オムニ
               </option>
             </select>
             <select id="input-court-rent-number">
@@ -236,6 +248,25 @@
               <option value="2" selected>2時間</option>
               <option value="3">3時間</option>
             </select>
+
+            <div>
+              <label for="input-court-rent-shitei">コート指定</label>
+              <input
+                type="radio"
+                id="input-court-rent-shitei-on"
+                name="input-court-rent-shitei"
+                value="1"
+              />
+              <label for="input-court-rent-shitei-on">あり</label>
+              <input
+                type="radio"
+                id="input-court-rent-shitei-off"
+                name="input-court-rent-shitei"
+                value="0"
+                checked
+              />
+              <label for="input-court-rent-shitei-off">なし</label>
+            </div>
           </div>
           <hr />
           <button type="button" id="input-court-rent-add-btn" class="upd-disp">
@@ -291,6 +322,17 @@
           <option value="7">7人</option>
           <option value="8">8人</option>
           <option value="9">9人</option>
+          <option value="10">10人</option>
+          <option value="11">11人</option>
+          <option value="12">12人</option>
+          <option value="13">13人</option>
+          <option value="14">14人</option>
+          <option value="15">15人</option>
+          <option value="16">16人</option>
+          <option value="17">17人</option>
+          <option value="18">18人</option>
+          <option value="19">19人</option>
+          <option value="20">20人</option>
         </select>
       </div>
     </section>
@@ -303,7 +345,7 @@
     </section>
 
     <footer style="position: fixed; bottom: 0">
-      <span>Ver. 3.3.1</span>
+      <span>Ver. 3.5.0</span>
       <span>デモ版</span>
     </footer>
   </body>
