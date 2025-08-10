@@ -64,7 +64,7 @@
                 `${addedCourtRent.name}/` +
                 `${addedCourtRent.number}ｺｰﾄ/` +
                 `${addedCourtRent.time}h/` +
-                `${addedCourtRent.fee}円／` +
+                `${addedCourtRent.fee}円/` +
                 `ｺｰﾄ指定${addedCourtRent.shitei ? "⭕️" : "❌"}` +
                 "</small></div>"
             );
@@ -86,10 +86,12 @@
             let confirmMsg = "下記の追加済みの借りるコートをクリアします。\n\n";
             addedCourtRentList.forEach((addedCourtRent) => {
               confirmMsg +=
-                `${addedCourtRent.name}／` +
-                `${addedCourtRent.number}コート／` +
-                `${addedCourtRent.time}時間／` +
-                `${addedCourtRent.fee.toLocaleString()}円\n`;
+                `${addedCourtRent.name}/` +
+                `${addedCourtRent.number}ｺｰﾄ/` +
+                `${addedCourtRent.time}h/` +
+                `${addedCourtRent.fee}円/` +
+                `ｺｰﾄ指定${addedCourtRent.shitei ? "⭕️" : "❌"}` +
+                "\n";
             });
             if (window.confirm(confirmMsg)) {
               addedCourtRentList = [];
@@ -242,11 +244,13 @@
               <option value="1" selected>1コート</option>
               <option value="2">2コート</option>
               <option value="3">3コート</option>
+              <option value="4">4コート</option>
             </select>
             <select id="input-court-rent-time">
               <option value="1">1時間</option>
               <option value="2" selected>2時間</option>
               <option value="3">3時間</option>
+              <option value="4">4時間</option>
             </select>
 
             <div>
@@ -345,7 +349,7 @@
     </section>
 
     <footer style="position: fixed; bottom: 0">
-      <span>Ver. 3.5.0</span>
+      <span>Ver. 3.5.1</span>
     </footer>
   </body>
 </html>
