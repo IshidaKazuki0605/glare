@@ -19,7 +19,7 @@
       }
     </style>
     <script>
-      const GUEST_UNIT_FEE = 1500;
+      const GUEST_UNIT_FEE = 1200;
       const COURT_RENT_SHITEI_FEE = 500;
 
       let addedCourtRentList = [];
@@ -224,9 +224,6 @@
               <option value="2500" label="[松テニ]割引なし❌">
                 [松テニ]割引なし❌
               </option>
-              <option value="2250" label="[松テニ]割引あり⭕️">
-                [松テニ]割引あり⭕️
-              </option>
               <option value="2000" label="[サンテニス]ハード">
                 [サンテニス]ハード
               </option>
@@ -303,9 +300,9 @@
         <label for="input-member-number">メンバーの人数</label>
         <select id="input-member-number" class="upd-disp">
           <option value="1">1人</option>
-          <option value="2">2人</option>
+          <option value="2" selected>2人</option>
           <option value="3">3人</option>
-          <option value="4" selected>4人</option>
+          <option value="4">4人</option>
           <option value="5">5人</option>
           <option value="6">6人</option>
           <option value="7">7人</option>
@@ -316,9 +313,9 @@
       <div>
         <label for="input-guest-number">ゲストの人数</label>
         <select id="input-guest-number" class="upd-disp">
-          <option value="0" selected>いない</option>
+          <option value="0">いない</option>
           <option value="1">1人</option>
-          <option value="2">2人</option>
+          <option value="2" selected>2人</option>
           <option value="3">3人</option>
           <option value="4">4人</option>
           <option value="5">5人</option>
@@ -349,7 +346,7 @@
     </section>
 
     <footer style="position: fixed; bottom: 0">
-      <span>Ver. 3.5.1</span>
+      <span>Ver. 3.6.0</span>
       <span>デモ版</span>
     </footer>
   </body>
